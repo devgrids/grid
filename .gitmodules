@@ -1,6 +1,3 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/microsoft/vcpkg
-[submodule "zar"]
-	path = zar
-	url = https://github.com/devgrids/zar
