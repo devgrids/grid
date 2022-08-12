@@ -1,3 +1,4 @@
+#include "App.h"
 #include "zar/API/GLCube.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -23,6 +24,9 @@ const char* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 {
+    App* a = new App();
+    a->start();
+
     const AnimationController* ac = new AnimationController();
     ac->mostrar();
 

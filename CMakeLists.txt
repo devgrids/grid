@@ -11,9 +11,13 @@ file(GLOB_RECURSE MAIN
          ${CMAKE_CURRENT_SOURCE_DIR}/include/*.cpp 
          ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/zar)
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/zar/)
+
+option(USE_CORE "Use Core" ON)
+if(USE_CORE)
+    add_subdirectory(zar)
+    list(APPEND EXTRA_LIBS zar-core)
+    list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/zar")
+endif()
 
 
 # -- GENERAMOS EL ARCHIVO *.h EN EL QUE TENDREMOS LOS VALORES DE LAS VARIABLES
@@ -75,7 +79,7 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
-set_target_properties(zar PROPERTIES
+set_target_properties(zar-core PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
 # message("OUTPUT: " ${PROJECT_SOURCE_DIR}/Core)
