@@ -1,6 +1,4 @@
-[submodule "vcpkg"]
-	path = vcpkg
-	url = https://github.com/microsoft/vcpkg
-[submodule "zar"]
-	path = zar
+[submodule "grid/vendor/zar"]
+	path = vendor/zar
 	url = https://github.com/devgrids/zar
+	branch = main
