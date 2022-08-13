@@ -23,12 +23,14 @@ endif()
 # -- GENERAMOS EL ARCHIVO *.h EN EL QUE TENDREMOS LOS VALORES DE LAS VARIABLES
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_SOURCE_DIR}/config.h)
 
+include_directories(vendor/zar/vendor/glm)
+include_directories(vendor/zar/vendor/stb)
+
 add_executable(${PROJECT_NAME} ${MAIN})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${EXTRA_LIBS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_BINARY_DIR}" ${EXTRA_INCLUDES})
-
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE 
 "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/grid/src/pch.h>")
