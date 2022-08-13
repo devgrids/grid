@@ -42,3 +42,10 @@ set_target_properties(zar PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
 # message("OUTPUT: " ${PROJECT_SOURCE_DIR}/Core)
+
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/assets
+                ${CMAKE_CURRENT_BINARY_DIR}/assets)
+
