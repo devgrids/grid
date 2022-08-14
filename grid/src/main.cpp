@@ -38,7 +38,7 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    const GLShader our_shader("assets/shaders/4.1.texture.vs", "assets/shaders/4.1.texture.fs"); 
+    const zar::GLShader our_shader("assets/shaders/4.1.texture.vs", "assets/shaders/4.1.texture.fs"); 
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
