@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
-#include <zar/api//GLShader.h>
+#include <zar/api/opengl/GLShader.h>
 #include <zar/core/interfaces/IApplication.h>
 
 // if (GLenum err = glewInit()) return 0;
