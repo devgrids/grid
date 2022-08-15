@@ -10,14 +10,14 @@ namespace grid
 
     struct __declspec(dllexport) Texture
     {
-        ZAR_INLINE Texture();
-        ZAR_INLINE ~Texture() = default;
-        ZAR_INLINE Texture(const Texture&) = default;
-        ZAR_INLINE operator GLuint() const { return id; }
-        ZAR_INLINE Texture(const char* path, TextureType type = TextureType::TEXTURE2D_RGB);
+        Texture();
+        ~Texture() = default;
+        Texture(const Texture&) = default;
+        operator GLuint() const { return id; }
+        Texture(const char* path, TextureType type = TextureType::TEXTURE2D_RGB);
 
-        ZAR_INLINE void load(const char* path, TextureType type = TextureType::TEXTURE2D_RGB);
-        ZAR_INLINE void bind() const;
+        void load(const char* path, TextureType type = TextureType::TEXTURE2D_RGB);
+        void bind() const;
 
         GLint width = 0;
         GLint height = 0;
