@@ -11,6 +11,7 @@
 #include "data/Material.h"
 #include "zar/api/opengl/GLCube.h"
 #include "zar/api/opengl/GLMesh.h"
+#include "zar/ecs/components/CameraComponent.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -21,7 +22,8 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-zar::GLCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+// zar::GLCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+zar::GLCamera* camera = new zar::GLCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -93,12 +95,15 @@ int main()
     ourShader.use();
     ourShader.set_int("texture1", 0);
     ourShader.set_int("texture2", 1);
-    zar::GLCube f = zar::GLCube();
+
+    zar::CameraComponent camera_component(camera);
+    camera_component.start();
 
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        camera_component.update();
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -124,12 +129,12 @@ int main()
         ourShader.use();
 
         // pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
+        glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
                                                 100.0f);
         ourShader.set_mat4("projection", projection);
 
         // camera/view transformation
-        glm::mat4 view = camera.get_view_matrix();
+        glm::mat4 view = camera->get_view_matrix();
         ourShader.set_mat4("view", view);
 
 
@@ -138,7 +143,7 @@ int main()
             // calculate the model matrix for each object and pass it to shader before drawing
             glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
             model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
+            const float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.set_mat4("model", model);
 
@@ -166,13 +171,13 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.process_keyboard(zar::FORWARD, deltaTime);
+        camera->process_keyboard(zar::FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.process_keyboard(zar::BACKWARD, deltaTime);
+        camera->process_keyboard(zar::BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.process_keyboard(zar::LEFT, deltaTime);
+        camera->process_keyboard(zar::LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.process_keyboard(zar::RIGHT, deltaTime);
+        camera->process_keyboard(zar::RIGHT, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -205,12 +210,12 @@ void mouse_callback(GLFWwindow* window, const double xposIn, const double yposIn
     lastX = xpos;
     lastY = ypos;
 
-    camera.process_mouse_movement(xoffset, yoffset);
+    camera->process_mouse_movement(xoffset, yoffset);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.process_mouse_scroll(static_cast<float>(yoffset));
+    camera->process_mouse_scroll(static_cast<float>(yoffset));
 }
