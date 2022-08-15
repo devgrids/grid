@@ -28,6 +28,8 @@ include_directories(vendor/zar/vendor/stb)
 
 add_executable(${PROJECT_NAME} ${MAIN})
 
+# target_compile_definitions(${PROJECT_NAME} PUBLIC STB_IMAGE_IMPLEMENTATION)
+
 target_link_libraries(${PROJECT_NAME} PUBLIC ${EXTRA_LIBS})
 target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_BINARY_DIR}" ${EXTRA_INCLUDES})
 
