@@ -11,6 +11,12 @@ file(GLOB_RECURSE MAIN
          ${CMAKE_CURRENT_SOURCE_DIR}/grid/src/*.cpp 
          ${CMAKE_CURRENT_SOURCE_DIR}/grid/src/*.h)
 
+file(GLOB_RECURSE ASSETS  
+    ${CMAKE_CURRENT_SOURCE_DIR}/grid/assets/shaders/*
+)
+
+source_group("assets" FILES ${ASSETS})
+
 
 option(USE_CORE "Use zar" ON)
 if(USE_CORE)
@@ -50,3 +56,5 @@ add_custom_command(
                 ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/assets
                 ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
+                
+target_sources(${PROJECT_NAME} PRIVATE ${ASSETS})

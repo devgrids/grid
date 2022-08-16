@@ -8,9 +8,12 @@
 #include "data/Texture.h"
 #include <zar/api/opengl/GLCamera.h>
 
+
+#include "data/animation.h"
+#include "data/animator.h"
 #include "data/Material.h"
+#include "data/Shader.h"
 #include "zar/api/opengl/GLCube.h"
-#include "zar/api/opengl/GLMesh.h"
 #include "zar/ecs/components/CameraComponent.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -71,7 +74,15 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    zar::GLShader ourShader("assets/shaders/7.3.camera.vs", "assets/shaders/7.3.camera.fs");
+    grid::Shader ourShader("7.3.camera");
+
+    grid::Shader ourShader2("1.model");
+
+    // load models
+    // -----------
+    Model ourModel("assets/objects/vampire/dancing_vampire.dae");
+    Animation danceAnimation("assets/objects/vampire/dancing_vampire.dae",&ourModel);
+    Animator animator(&danceAnimation);
 
 
     glm::vec3 cubePositions[] = {
@@ -87,8 +98,8 @@ int main()
         glm::vec3(-1.3f, 1.0f, -1.5f)
     };
 
-    grid::Texture texture1("assets/textures/container.jpg", grid::TEXTURE2D_RGB);
-    grid::Texture texture2("assets/textures/awesomeface.png", grid::TEXTURE2D_RGBA);
+    const grid::Texture texture1("assets/textures/container.jpg");
+    grid::Texture texture2("assets/textures/awesomeface.png");
 
     grid::Material s;
 
@@ -113,6 +124,7 @@ int main()
         // input
         // -----
         processInput(window);
+        animator.UpdateAnimation(deltaTime);
 
         // render
         // ------
@@ -150,7 +162,26 @@ int main()
             zar::render_cube();
         }
 
-        // zar::render_cube();
+        ourShader2.use();
+
+        // view/projection transformations
+        projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera->get_view_matrix();
+        ourShader2.set_mat4("projection", projection);
+        ourShader2.set_mat4("view", view);
+
+        auto transforms = animator.GetFinalBoneMatrices();
+        for (int i = 0; i < transforms.size(); ++i)
+            ourShader2.set_mat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+
+
+        // render the loaded model
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(3.0f, -0.4f, 3.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
+        ourShader2.set_mat4("model", model);
+        ourModel.Draw(ourShader);
+        
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
