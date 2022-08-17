@@ -210,8 +210,8 @@ private:
 		string filename = string(path);
 		filename = directory + '/' + filename;
 
-		grid::Texture grad(filename.c_str());
-		return grad.get_id();
+		const grid::Texture file(filename.c_str());
+		return file.get_id();
 	}
     
     // checks all material textures of a given type and loads the textures if they're not loaded yet.

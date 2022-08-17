@@ -9,11 +9,12 @@
 #include <zar/api/opengl/gl_camera.h>
 
 
-#include "data/animation.h"
-#include "data/animator.h"
 #include "data/material.h"
+#include "data/Model.h"
 #include "data/shader.h"
 #include "zar/api/opengl/gl_cube.h"
+#include "zar/data/animation.h"
+#include "zar/data/animator.h"
 #include "zar/ecs/components/camera_component.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -83,8 +84,9 @@ int main()
     // -----------
     Model modelf("assets/objects/tunel/tunel.obj");
     Model ourModel("assets/objects/vampire/dancing_vampire.dae");
-    Animation danceAnimation("assets/objects/vampire/dancing_vampire.dae",&ourModel);
-    Animator animator(&danceAnimation);
+    zar::Animation danceAnimation("assets/objects/vampire/dancing_vampire.dae", ourModel.GetBoneInfoMap(),
+                                  ourModel.GetBoneCount());
+    zar::Animator animator(&danceAnimation);
 
 
     glm::vec3 cubePositions[] = {
@@ -126,7 +128,7 @@ int main()
         // input
         // -----
         processInput(window);
-        animator.UpdateAnimation(deltaTime);
+        animator.update_animation(deltaTime);
 
         // render
         // ------
@@ -172,37 +174,39 @@ int main()
         ourShader2.set_mat4("projection", projection);
         ourShader2.set_mat4("view", view);
 
-        auto transforms = animator.GetFinalBoneMatrices();
+        auto transforms = animator.get_final_bone_matrices();
         for (int i = 0; i < transforms.size(); ++i)
             ourShader2.set_mat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(3.0f, -0.4f, 3.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
+        model = glm::translate(model, glm::vec3(3.0f, -0.4f, 3.0f));
+        // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(.5f, .5f, .5f)); // it's a bit too big for our scene, so scale it down
         ourShader2.set_mat4("model", model);
         ourModel.Draw(ourShader);
-        
+
 
         ourShader3.use();
 
 
         // view/projection transformations
-         projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-         view = camera->get_view_matrix();
+        projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera->get_view_matrix();
         ourShader3.set_mat4("projection", projection);
         ourShader3.set_mat4("view", view);
 
         // render the loaded model
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f)); // it's a bit too big for our scene, so scale it down
         ourShader3.set_mat4("model", model);
-        
+
         modelf.Draw(ourShader3);
 
-        
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
