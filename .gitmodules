@@ -1,0 +1,4 @@
+[submodule "vendor/zar"]
+	path = vendor/zar
+	url = https://github.com/devgrids/zar
+	branch = main
