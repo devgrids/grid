@@ -5,8 +5,8 @@
 #include <glm/glm.hpp>
 #include <assimp/scene.h>
 
-#include "bone.h"
 #include "Model.h"
+#include "zar/data/bone.h"
 
 
 struct AssimpNodeData
@@ -40,12 +40,12 @@ public:
 	{
 	}
 
-	Bone* FindBone(const std::string& name)
+	zar::Bone* FindBone(const std::string& name)
 	{
 		auto iter = std::find_if(m_Bones.begin(), m_Bones.end(),
-			[&](const Bone& Bone)
+			[&](const zar::Bone& Bone)
 			{
-				return Bone.GetBoneName() == name;
+				return Bone.get_bone_name() == name;
 			}
 		);
 		if (iter == m_Bones.end()) return nullptr;
@@ -56,7 +56,7 @@ public:
 	inline float GetTicksPerSecond() { return m_TicksPerSecond; }
 	inline float GetDuration() { return m_Duration;}
 	inline const AssimpNodeData& GetRootNode() { return m_RootNode; }
-	inline const std::unordered_map<std::string, BoneInfo>& GetBoneIDMap() 
+	inline const std::unordered_map<std::string, zar::BoneInfo>& GetBoneIDMap() 
 	{ 
 		return m_BoneInfoMap;
 	}
@@ -80,8 +80,8 @@ private:
 				boneInfoMap[boneName].id = boneCount;
 				boneCount++;
 			}
-			m_Bones.push_back(Bone(channel->mNodeName.data,
-				boneInfoMap[channel->mNodeName.data].id, channel));
+			m_Bones.push_back(zar::Bone(channel->mNodeName.data,
+			                            boneInfoMap[channel->mNodeName.data].id, channel));
 		}
 
 		m_BoneInfoMap = boneInfoMap;
@@ -92,7 +92,7 @@ private:
 		assert(src);
 
 		dest.name = src->mName.data;
-		dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
+		dest.transformation = zar::AssimpGLMHelpers::convert_matrix_to_glm_format(src->mTransformation);
 		dest.childrenCount = src->mNumChildren;
 
 		for (int i = 0; i < src->mNumChildren; i++)
@@ -104,7 +104,7 @@ private:
 	}
 	float m_Duration;
 	int m_TicksPerSecond;
-	std::vector<Bone> m_Bones;
+	std::vector<zar::Bone> m_Bones;
 	AssimpNodeData m_RootNode;
-	std::unordered_map<std::string, BoneInfo> m_BoneInfoMap;
+	std::unordered_map<std::string, zar::BoneInfo> m_BoneInfoMap;
 };

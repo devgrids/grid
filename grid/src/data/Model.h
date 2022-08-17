@@ -12,14 +12,16 @@
 
 #include <string>
 #include <fstream>
-#include <sstream>
+
 #include <iostream>
-#include <map>
+
 #include <vector>
 
-#include "animdata.h"
-#include "assimp_glm_helpers.h"
-#include "Mesh.h"
+
+#include "texture.h"
+#include "zar/data/anim_data.h"
+#include "zar/data/assimp_glm_helpers.h"
+#include "zar/data/Mesh.h"
 
 
 using namespace std;
@@ -28,8 +30,8 @@ class Model
 {
 public:
     // model data 
-    vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-    vector<Mesh>    meshes;
+    vector<zar::Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    vector<zar::Mesh>    meshes;
     string directory;
     bool gammaCorrection;
 	
@@ -42,7 +44,7 @@ public:
     }
 
     // draws the model, and thus all its meshes
-    void Draw(grid::Shader &shader)
+    void Draw(zar::GLShader &shader)
     {
         for(unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
@@ -54,7 +56,7 @@ public:
 
 private:
 
-	std::unordered_map<std::string, BoneInfo> m_BoneInfoMap;
+	std::unordered_map<std::string, zar::BoneInfo> m_BoneInfoMap;
 	int m_BoneCounter = 0;
 
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -95,38 +97,38 @@ private:
 
     }
 
-	void SetVertexBoneDataToDefault(Vertex& vertex)
+	void SetVertexBoneDataToDefault(zar::Vertex& vertex)
 	{
 		for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
 		{
-			vertex.m_BoneIDs[i] = -1;
-			vertex.m_Weights[i] = 0.0f;
+			vertex.bones[i] = -1;
+			vertex.weights[i] = 0.0f;
 		}
 	}
 
 
-	Mesh processMesh(aiMesh* mesh, const aiScene* scene)
+    zar::Mesh processMesh(aiMesh* mesh, const aiScene* scene)
 	{
-		vector<Vertex> vertices;
+		vector<zar::Vertex> vertices;
 		vector<unsigned int> indices;
-		vector<Texture> textures;
+		vector<zar::Texture> textures;
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
-			Vertex vertex;
+			zar::Vertex vertex;
 			SetVertexBoneDataToDefault(vertex);
-			vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
-			vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
+			vertex.position = zar::AssimpGLMHelpers::get_glm_vec(mesh->mVertices[i]);
+			vertex.normal = zar::AssimpGLMHelpers::get_glm_vec(mesh->mNormals[i]);
 			
 			if (mesh->mTextureCoords[0])
 			{
 				glm::vec2 vec;
 				vec.x = mesh->mTextureCoords[0][i].x;
 				vec.y = mesh->mTextureCoords[0][i].y;
-				vertex.TexCoords = vec;
+				vertex.text_coords = vec;
 			}
 			else
-				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+				vertex.text_coords = glm::vec2(0.0f, 0.0f);
 
 			vertices.push_back(vertex);
 		}
@@ -138,35 +140,35 @@ private:
 		}
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-		vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+		vector<zar::Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		vector<zar::Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-		std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+		std::vector<zar::Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-		std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+		std::vector<zar::Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 		textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
 		ExtractBoneWeightForVertices(vertices,mesh,scene);
 
-		return Mesh(vertices, indices, textures);
+		return zar::Mesh(vertices, indices, textures);
 	}
 
-	void SetVertexBoneData(Vertex& vertex, int boneID, float weight)
+	void SetVertexBoneData(zar::Vertex& vertex, int boneID, float weight)
 	{
 		for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
 		{
-			if (vertex.m_BoneIDs[i] < 0)
+			if (vertex.bones[i] < 0)
 			{
-				vertex.m_Weights[i] = weight;
-				vertex.m_BoneIDs[i] = boneID;
+				vertex.weights[i] = weight;
+				vertex.bones[i] = boneID;
 				break;
 			}
 		}
 	}
 
 
-	void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
+	void ExtractBoneWeightForVertices(std::vector<zar::Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
 	{
 		auto& boneInfoMap = m_BoneInfoMap;
 		int& boneCount = m_BoneCounter;
@@ -177,9 +179,9 @@ private:
 			std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
 			if (boneInfoMap.find(boneName) == boneInfoMap.end())
 			{
-				BoneInfo newBoneInfo;
+				zar::BoneInfo newBoneInfo;
 				newBoneInfo.id = boneCount;
-				newBoneInfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+				newBoneInfo.offset = zar::AssimpGLMHelpers::convert_matrix_to_glm_format(mesh->mBones[boneIndex]->mOffsetMatrix);
 				boneInfoMap[boneName] = newBoneInfo;
 				boneID = boneCount;
 				boneCount++;
@@ -214,9 +216,9 @@ private:
     
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
-    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
+    vector<zar::Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
     {
-        vector<Texture> textures;
+        vector<zar::Texture> textures;
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
             aiString str;
@@ -234,7 +236,7 @@ private:
             }
             if(!skip)
             {   // if texture hasn't been loaded already, load it
-                Texture texture;
+	            zar::Texture texture;
                 texture.id = TextureFromFile(str.C_Str(), this->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();

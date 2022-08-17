@@ -5,16 +5,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "data/Texture.h"
-#include <zar/api/opengl/GLCamera.h>
+#include "data/texture.h"
+#include <zar/api/opengl/gl_camera.h>
 
 
 #include "data/animation.h"
 #include "data/animator.h"
-#include "data/Material.h"
-#include "data/Shader.h"
-#include "zar/api/opengl/GLCube.h"
-#include "zar/ecs/components/CameraComponent.h"
+#include "data/material.h"
+#include "data/shader.h"
+#include "zar/api/opengl/gl_cube.h"
+#include "zar/ecs/components/camera_component.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -77,9 +77,11 @@ int main()
     grid::Shader ourShader("7.3.camera");
 
     grid::Shader ourShader2("1.model");
+    grid::Shader ourShader3("model");
 
     // load models
     // -----------
+    Model modelf("assets/objects/tunel/tunel.obj");
     Model ourModel("assets/objects/vampire/dancing_vampire.dae");
     Animation danceAnimation("assets/objects/vampire/dancing_vampire.dae",&ourModel);
     Animator animator(&danceAnimation);
@@ -183,6 +185,24 @@ int main()
         ourModel.Draw(ourShader);
         
 
+        ourShader3.use();
+
+
+        // view/projection transformations
+         projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+         view = camera->get_view_matrix();
+        ourShader3.set_mat4("projection", projection);
+        ourShader3.set_mat4("view", view);
+
+        // render the loaded model
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        ourShader3.set_mat4("model", model);
+        
+        modelf.Draw(ourShader3);
+
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);

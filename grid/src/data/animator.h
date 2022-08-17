@@ -44,12 +44,12 @@ public:
         std::string nodeName = node->name;
         glm::mat4 nodeTransform = node->transformation;
 
-        Bone* Bone = m_CurrentAnimation->FindBone(nodeName);
+        zar::Bone* Bone = m_CurrentAnimation->FindBone(nodeName);
 
         if (Bone)
         {
-            Bone->Update(m_CurrentTime);
-            nodeTransform = Bone->GetLocalTransform();
+            Bone->update(m_CurrentTime);
+            nodeTransform = Bone->get_local_transform();
         }
 
         glm::mat4 globalTransformation = parentTransform * nodeTransform;

@@ -11,9 +11,9 @@
 #include <assimp/pbrmaterial.h>
 #include <assimp/postprocess.h>
 
-#include <zar/api/opengl/GLShader.h>
-#include <zar/api/opengl/GLMesh.h>
-#include <zar/core/interfaces/IApplication.h>
+#include <zar/api/opengl/gl_shader.h>
+#include <zar/api/opengl/gl_mesh.h>
+#include <zar/core/interfaces/application.h>
 
 
 // if (GLenum err = glewInit()) return 0;

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "zar/api/opengl/GLTexture.h"
+#include "zar/api/opengl/gl_texture.h"
 
 namespace grid
 {
