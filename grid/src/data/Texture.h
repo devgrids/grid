@@ -11,6 +11,7 @@ namespace grid
         ~Texture();
 
         void load(const char* path) override;
+        std::string type;
     };
 
     using SharedTexture = std::shared_ptr<Texture>;

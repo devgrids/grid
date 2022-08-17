@@ -1,20 +1,28 @@
 ﻿#pragma once
+#include <map>
+
 #include "texture.h"
 #include "zar/data/Model.h"
 
 namespace grid
 {
-    class __declspec(dllexport) Model final : public zar::Model
+    class __declspec(dllexport) Model : public zar::Model
     {
     public:
-        Model(string const& path, bool gamma = false);
+        explicit Model(string const& path, bool gamma = false);
 
     private:
         void load_model(string const& path);
-        void process_node(const aiNode* node, const aiScene* scene);
-        inline zar::Mesh process_mesh(aiMesh* mesh, const aiScene* scene) override;
-        inline vector<zar::Texture> process_materials(aiMesh* mesh, const aiScene* scene) override;
-        unsigned int texture_from_file(const char* path, const string& directory, bool gamma = false);
-        vector<zar::Texture> load_material_textures(aiMaterial* mat, aiTextureType type, string type_name);
+        void process_node(const aiNode* node);
+        inline zar::Mesh process_mesh(aiMesh* mesh) override;
+        inline vector<zar::Material> process_materials(aiMesh* mesh) override;
+        static unsigned int texture_from_file(const char* path, const string& directory, bool gamma = false);
+        vector<zar::Material> load_materials(const aiMaterial* mat) const;
+        void get_texture_diffuse(vector<zar::Material>& materials, const aiMaterial* mat) const;
+        void get_texture_specular(vector<zar::Material>& materials, const aiMaterial* mat) const;
+        void get_texture_normal(vector<zar::Material>& materials, const aiMaterial* mat) const;
+        void get_texture_height(vector<zar::Material>& materials, const aiMaterial* mat) const;
+
+        map<std::string, zar::Material> map_materials;
     };
 }

@@ -24,8 +24,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+constexpr unsigned int SCR_WIDTH = 800;
+constexpr unsigned int SCR_HEIGHT = 600;
 
 // zar::GLCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 zar::GLCamera* camera = new zar::GLCamera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -83,7 +83,7 @@ int main()
 
     // load models
     // -----------
-    grid::Model modelf("assets/objects/tunel/tunel.obj");
+    grid::Model modelf("assets/objects/bear/bear.obj");
     grid::Model ourModel("assets/objects/vampire/dancing_vampire.dae");
     zar::Animation danceAnimation("assets/objects/vampire/dancing_vampire.dae", ourModel.get_bone_info_map(),
                                   ourModel.get_bone_count());
@@ -138,9 +138,9 @@ int main()
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        texture1.bind();
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        texture2.bind();
 
         // activate shader
         our_shader.use();
