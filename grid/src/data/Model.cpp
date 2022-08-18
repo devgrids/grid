@@ -1,13 +1,13 @@
-﻿#include "Model.h"
+﻿#include "model.h"
 #include <vector>
 
-grid::Model::Model(string const& path, const bool gamma): zar::Model(gamma)
+grid::Model::Model(std::string const& path, const bool gamma): zar::GLModel(gamma)
 {
     spdlog::error("model: {}", path);
     load_model(path);
 }
 
-void grid::Model::load_model(string const& path)
+void grid::Model::load_model(std::string const& path)
 {
     Assimp::Importer importer;
     scene = importer.ReadFile(
@@ -35,30 +35,30 @@ void grid::Model::process_node(const aiNode* node)
     }
 }
 
-zar::Mesh grid::Model::process_mesh(aiMesh* mesh)
+zar::GLMesh grid::Model::process_mesh(aiMesh* mesh)
 {
-    auto _mesh = zar::Model::process_mesh(mesh);
+    auto _mesh = zar::GLModel::process_mesh(mesh);
     _mesh.materials = process_materials(mesh);
     return _mesh;
 }
 
-vector<zar::Material> grid::Model::process_materials(aiMesh* mesh)
+std::vector<zar::Material> grid::Model::process_materials(aiMesh* mesh)
 {
-    zar::Model::process_materials(mesh);
+    zar::GLModel::process_materials(mesh);
     const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     return load_materials(material);
 }
 
-unsigned int grid::Model::texture_from_file(const char* path, const string& directory, bool gamma)
+unsigned int grid::Model::texture_from_file(const char* path, const std::string& directory, bool gamma)
 {
-    auto filename = string(path);
+    auto filename = std::string(path);
     filename = directory + '/' + filename;
     return Texture(filename.c_str()).get_id();
 }
 
-vector<zar::Material> grid::Model::load_materials(const aiMaterial* mat) const
+std::vector<zar::Material> grid::Model::load_materials(const aiMaterial* mat) const
 {
-    vector<zar::Material> materials;
+    std::vector<zar::Material> materials;
     get_texture_diffuse(materials, mat);
     get_texture_specular(materials, mat);
     get_texture_normal(materials, mat);
@@ -66,9 +66,9 @@ vector<zar::Material> grid::Model::load_materials(const aiMaterial* mat) const
     return materials;
 }
 
-void grid::Model::get_texture_diffuse(vector<zar::Material>& materials, const aiMaterial* mat) const
+void grid::Model::get_texture_diffuse(std::vector<zar::Material>& materials, const aiMaterial* mat) const
 {
-    spdlog::info("get_texture_diffuse({})", mat->GetTextureCount(aiTextureType_DIFFUSE));
+    // spdlog::info("get_texture_diffuse({})", mat->GetTextureCount(aiTextureType_DIFFUSE));
     for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_DIFFUSE); i++)
     {
         if (i >= materials.size()) { materials.push_back({}); }
@@ -78,12 +78,11 @@ void grid::Model::get_texture_diffuse(vector<zar::Material>& materials, const ai
         materials[i].diffuse_map.id = texture_from_file(str.C_Str(), this->directory);
         materials[i].diffuse_map.path = str.C_Str();
     }
-    spdlog::warn("materials({})", materials.size());
 }
 
-void grid::Model::get_texture_specular(vector<zar::Material>& materials, const aiMaterial* mat) const
+void grid::Model::get_texture_specular(std::vector<zar::Material>& materials, const aiMaterial* mat) const
 {
-    spdlog::info("get_texture_specular({})", mat->GetTextureCount(aiTextureType_SPECULAR));
+    // spdlog::info("get_texture_specular({})", mat->GetTextureCount(aiTextureType_SPECULAR));
     for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_SPECULAR); i++)
     {
         if (i >= materials.size()) { materials.push_back({}); }
@@ -93,12 +92,11 @@ void grid::Model::get_texture_specular(vector<zar::Material>& materials, const a
         materials[i].specular_map.id = texture_from_file(str.C_Str(), this->directory);
         materials[i].specular_map.path = str.C_Str();
     }
-    spdlog::warn("materials({})", materials.size());
 }
 
-void grid::Model::get_texture_normal(vector<zar::Material>& materials, const aiMaterial* mat) const
+void grid::Model::get_texture_normal(std::vector<zar::Material>& materials, const aiMaterial* mat) const
 {
-    spdlog::info("get_texture_normal({})", mat->GetTextureCount(aiTextureType_HEIGHT));
+    // spdlog::info("get_texture_normal({})", mat->GetTextureCount(aiTextureType_HEIGHT));
     for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_HEIGHT); i++)
     {
         if (i >= materials.size()) { materials.push_back({}); }
@@ -108,12 +106,11 @@ void grid::Model::get_texture_normal(vector<zar::Material>& materials, const aiM
         materials[i].normal_map.id = texture_from_file(str.C_Str(), this->directory);
         materials[i].normal_map.path = str.C_Str();
     }
-    spdlog::warn("materials({})", materials.size());
 }
 
-void grid::Model::get_texture_height(vector<zar::Material>& materials, const aiMaterial* mat) const
+void grid::Model::get_texture_height(std::vector<zar::Material>& materials, const aiMaterial* mat) const
 {
-    spdlog::info("get_texture_height({})", mat->GetTextureCount(aiTextureType_AMBIENT));
+    // spdlog::info("get_texture_height({})", mat->GetTextureCount(aiTextureType_AMBIENT));
     for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_AMBIENT); i++)
     {
         if (i >= materials.size()) { materials.push_back({}); }
@@ -123,5 +120,4 @@ void grid::Model::get_texture_height(vector<zar::Material>& materials, const aiM
         materials[i].height_map.id = texture_from_file(str.C_Str(), this->directory);
         materials[i].height_map.path = str.C_Str();
     }
-    spdlog::warn("materials({})", materials.size());
 }

@@ -12,7 +12,6 @@
 #include <assimp/postprocess.h>
 
 #include <zar/api/opengl/gl_shader.h>
-#include <zar/api/opengl/gl_mesh.h>
 #include <zar/core/interfaces/application.h>
 
 

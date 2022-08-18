@@ -13,9 +13,9 @@
 #include "data/model.h"
 
 #include "data/shader.h"
+#include "zar/api/opengl/gl_animation.h"
+#include "zar/api/opengl/gl_animator.h"
 #include "zar/api/opengl/gl_cube.h"
-#include "zar/data/animation.h"
-#include "zar/data/animator.h"
 #include "zar/ecs/components/camera_component.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -85,9 +85,9 @@ int main()
     // -----------
     grid::Model modelf("assets/objects/bear/bear.obj");
     grid::Model ourModel("assets/objects/vampire/dancing_vampire.dae");
-    zar::Animation danceAnimation("assets/objects/vampire/dancing_vampire.dae", ourModel.get_bone_info_map(),
+    zar::GLAnimation dance_animation("assets/objects/vampire/dancing_vampire.dae", ourModel.get_bone_info_map(),
                                   ourModel.get_bone_count());
-    zar::Animator animator(&danceAnimation);
+    zar::GLAnimator animator(&dance_animation);
 
 
     glm::vec3 cubePositions[] = {
