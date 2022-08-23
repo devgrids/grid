@@ -3,7 +3,7 @@
 
 grid::Model::Model(std::string const& path, const bool gamma): zar::GLModel(gamma)
 {
-    spdlog::error("model: {}", path);
+    // spdlog::error("model: {}", path);
     load_model(path);
 }
 

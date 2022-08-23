@@ -8,11 +8,11 @@
 #include "data/texture.h"
 #include <zar/api/opengl/gl_camera.h>
 
-
-#include "data/material.h"
+#include "data/application.h"
 #include "data/model.h"
 
 #include "data/shader.h"
+#include "objects/game_object.h"
 #include "zar/api/opengl/gl_animation.h"
 #include "zar/api/opengl/gl_animator.h"
 #include "zar/api/opengl/gl_cube.h"
@@ -76,17 +76,17 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    grid::Shader our_shader("7.3.camera");
+    grid::Shader shader_camera("7.3.camera");
 
-    grid::Shader our_shader2("1.model");
-    grid::Shader our_shader3("model");
+    grid::Shader shader_animation("1.model");
+    grid::Shader shader_model("model");
 
     // load models
     // -----------
-    grid::Model modelf("assets/objects/bear/bear.obj");
-    grid::Model ourModel("assets/objects/vampire/dancing_vampire.dae");
-    zar::GLAnimation dance_animation("assets/objects/vampire/dancing_vampire.dae", ourModel.get_bone_info_map(),
-                                  ourModel.get_bone_count());
+    grid::GameObject object_bear("assets/objects/bear/bear.obj");
+    grid::Model object_vampire("assets/objects/vampire/dancing_vampire.dae");
+    zar::GLAnimation dance_animation("assets/objects/vampire/dancing_vampire.dae", object_vampire.get_bone_info_map(),
+                                     object_vampire.get_bone_count());
     zar::GLAnimator animator(&dance_animation);
 
 
@@ -106,11 +106,10 @@ int main()
     const grid::Texture texture1("assets/textures/container.jpg");
     grid::Texture texture2("assets/textures/awesomeface.png");
 
-    grid::Material s;
 
-    our_shader.use();
-    our_shader.set_int("texture1", 0);
-    our_shader.set_int("texture2", 1);
+    shader_camera.use();
+    shader_camera.set_int("texture1", 0);
+    shader_camera.set_int("texture2", 1);
 
     zar::CameraComponent camera_component(camera);
     camera_component.start();
@@ -143,17 +142,18 @@ int main()
         texture2.bind();
 
         // activate shader
-        our_shader.use();
+        shader_camera.use();
 
-        // pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
-                                                100.0f);
-        our_shader.set_mat4("projection", projection);
+        // --------------------------------------------------------------------------------------------------------
 
-        // camera/view transformation
+        glm::mat4 projection = camera->get_projection_matrix(
+            static_cast<float>(Application::SCR_WIDTH) / static_cast<float>(Application::SCR_HEIGHT));
         glm::mat4 view = camera->get_view_matrix();
-        our_shader.set_mat4("view", view);
 
+        shader_camera.set_mat4("projection", projection);
+        shader_camera.set_mat4("view", view);
+
+        // --------------------------------------------------------------------------------------------------------
 
         for (unsigned int i = 0; i < 10; i++)
         {
@@ -162,22 +162,19 @@ int main()
             model = glm::translate(model, cubePositions[i]);
             const float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            our_shader.set_mat4("model", model);
+            shader_camera.set_mat4("model", model);
 
             zar::render_cube();
         }
 
-        our_shader2.use();
-
-        // view/projection transformations
-        projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        view = camera->get_view_matrix();
-        our_shader2.set_mat4("projection", projection);
-        our_shader2.set_mat4("view", view);
+        shader_animation.use();
+        
+        shader_animation.set_mat4("projection", projection);
+        shader_animation.set_mat4("view", view);
 
         auto transforms = animator.get_final_bone_matrices();
         for (int i = 0; i < transforms.size(); ++i)
-            our_shader2.set_mat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+            shader_animation.set_mat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
 
         // render the loaded model
@@ -185,27 +182,10 @@ int main()
         model = glm::translate(model, glm::vec3(3.0f, -0.4f, 3.0f));
         // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(.5f, .5f, .5f)); // it's a bit too big for our scene, so scale it down
-        our_shader2.set_mat4("model", model);
-        ourModel.draw(our_shader);
+        shader_animation.set_mat4("model", model);
+        object_vampire.draw(shader_camera);
 
-
-        our_shader3.use();
-
-
-        // view/projection transformations
-        projection = glm::perspective(glm::radians(camera->zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        view = camera->get_view_matrix();
-        our_shader3.set_mat4("projection", projection);
-        our_shader3.set_mat4("view", view);
-
-        // render the loaded model
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f)); // it's a bit too big for our scene, so scale it down
-        our_shader3.set_mat4("model", model);
-
-        modelf.draw(our_shader3);
+        object_bear.render(shader_model, projection, view);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
