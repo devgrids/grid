@@ -13,5 +13,7 @@ UCLASS()
 class GRID_API AGridGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+public:
+	UFUNCTION(Exec)
+	void MyTestFunction();
 };

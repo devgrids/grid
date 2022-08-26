@@ -23,6 +23,17 @@ void AGridCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (static const IConsoleVariable* ExtraForce = IConsoleManager::Get().FindConsoleVariable(TEXT("OurGame.ExtraMagnetism")); ExtraForce != nullptr &&
+		ExtraForce->GetInt() != 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CMD") );
+	}
+	else
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("NOT CMD") );
+
+	}
+
 }
 
 // Called to bind functionality to input
