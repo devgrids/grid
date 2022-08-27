@@ -28,8 +28,6 @@ void AGridPlayerController::PlayerTick(float DeltaTime)
 void AGridPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
-
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jump/Boost", EKeys::SpaceBar));
 
 	MyActionBinding = FInputActionBinding("Jump/Boost", IE_Pressed);
@@ -67,9 +65,9 @@ void AGridPlayerController::StopInput()
 	// }
 
 
-	if (bandera)
-		RemoveInputBindings();
-	else
-		AddInputBindings();
-	bandera = !bandera;
+	// if (bandera)
+	// 	RemoveInputBindings();
+	// else
+	// 	AddInputBindings();
+	// bandera = !bandera;
 }

@@ -34,6 +34,7 @@ public:
 	void FireWeapon();
 
 	void InitializeDefaultPawnInputBindings();
+	UFUNCTION(BlueprintCallable)
 	void AddInputBindings();
 	UFUNCTION(BlueprintCallable)
 	void RemoveInputBindings();
