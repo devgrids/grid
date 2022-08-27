@@ -12,18 +12,40 @@ class GRID_API AGridCharacterBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AGridCharacterBase();
-
-protected:
-	// Called when the game starts or when spawned
+	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//*****************************************************************************
+	// Interface
+	//*****************************************************************************
 
+	//*****************************************************************************
+	// AI
+	//*****************************************************************************
+
+	//*****************************************************************************
+
+	//*****************************************************************************
+	// Components
+	//*****************************************************************************
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USpringArmComponent* CameraBoom{nullptr};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UCameraComponent* FollowCamera{nullptr};
+
+	//*****************************************************************************
+
+
+	//*****************************************************************************
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FText CharacterName;
+
+private:
+	FORCEINLINE USpringArmComponent* GetSpringArmComponent() const { return CameraBoom; }
+	FORCEINLINE UCameraComponent* GetCameraComponent() const { return FollowCamera; }
 };

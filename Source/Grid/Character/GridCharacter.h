@@ -13,5 +13,7 @@ UCLASS()
 class GRID_API AGridCharacter : public AGridCharacterBase
 {
 	GENERATED_BODY()
-	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FPS, meta = (AllowPrivateAccess = "true"))
+	float Count = 0;
 };

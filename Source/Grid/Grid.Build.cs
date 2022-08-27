@@ -9,7 +9,7 @@ public class Grid : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "ImGui", "Paper2D" });
+			{ "Core", "CoreUObject", "Engine", "InputCore", "ImGui", "Paper2D"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
