@@ -1,4 +1,4 @@
-# [Grid Engine](https://github.com/dev3097/grid-engine)
+# [Grid](https://github.com/devgrids/grid)
 
 ## Summary
 Grid is a graphics engine developed with the OpenGL API.
