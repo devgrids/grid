@@ -20,17 +20,17 @@ source_group("assets" FILES ${ASSETS})
 
 option(USE_CORE "Use zar" ON)
 if(USE_CORE)
-    add_subdirectory(vendor/zar)
+    add_subdirectory(zar)
     list(APPEND EXTRA_LIBS zar)
-    list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/vendor/zar")
+    list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/zar")
 endif()
 
 
 # -- GENERAMOS EL ARCHIVO *.h EN EL QUE TENDREMOS LOS VALORES DE LAS VARIABLES
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_SOURCE_DIR}/config.h)
 
-include_directories(vendor/zar/vendor/glm)
-include_directories(vendor/zar/vendor/stb)
+include_directories(zar/vendor/glm)
+include_directories(zar/vendor/stb)
 
 add_executable(${PROJECT_NAME} ${MAIN})
 
