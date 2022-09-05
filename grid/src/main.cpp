@@ -18,6 +18,9 @@
 #include "zar/api/opengl/gl_cube.h"
 #include "zar/ecs/components/camera_component.h"
 
+#include "imgui.h"
+#include "PxPhysXConfig.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
