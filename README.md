@@ -1,7 +1,7 @@
 # [Grid](https://github.com/devgrids/grid)
 
 ## Summary
-Grid is an educational graphic animal editor, compatible with pc and virtual reality
+Grid is an educational graphic editor, compatible with pc and virtual reality
 
 ## Branches
 
