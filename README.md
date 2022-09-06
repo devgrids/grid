@@ -50,7 +50,6 @@ cmake ..
 cmake -G "Xcode" ..
 
 # Microsoft Windows
-cmake -G "Visual Studio 16" ..
-cmake -G "Visual Studio 16 Win64" ..
+cmake -G "Visual Studio 17 2022" -B "build"
 ...
 ...
