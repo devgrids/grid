@@ -13,7 +13,6 @@ Now configure vcpkg, a Microsoft library that allows you to add external library
 
 ```bash
 .\vcpkg\bootstrap-vcpkg.bat
-.\vcpkg\vcpkg integrate install
 ```
 Install the following libraries with vcpkg:
 
