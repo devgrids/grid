@@ -3,7 +3,7 @@
 
 namespace grid
 {
-    class __declspec(dllexport) Texture final : public zar::GLTexture
+    class Texture final : public zar::GLTexture
     {
     public:
         Texture();

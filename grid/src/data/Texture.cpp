@@ -25,7 +25,7 @@ void grid::Texture::load(const char* path)
         spdlog::error("failed to load texture: {}", path);
         return;
     }
-    GLTexture::generate(path, data);
+    generate(path, data);
     stbi_image_free(data);
 }
 
