@@ -1,5 +1,9 @@
 ﻿#include "Shader.h"
 
+grid::Shader::Shader()
+{
+}
+
 grid::Shader::Shader(const std::string& name): GLShader(
     ("assets/shaders/" + name + ".vert").c_str(),
     ("assets/shaders/" + name + ".frag").c_str()

@@ -18,6 +18,9 @@
 #include "zar/api/opengl/gl_cube.h"
 #include "zar/ecs/components/camera_component.h"
 
+#include "data/asset.h"
+#include "data/Skybox.h"
+
 #include "imgui.h"
 #include "PxPhysXConfig.h"
 #include "PxPhysicsAPI.h"
@@ -169,6 +172,9 @@ int main()
     if (GLenum err = glewInit()) return 0;
     glEnable(GL_DEPTH_TEST);
 
+    grid::Asset::load_shader("cubemaps");
+    grid::Asset::load_shader("skybox");
+
     grid::Shader shader_camera("7.3.camera");
     grid::Shader shader_animation("1.model");
     grid::Shader shader_model("model");
@@ -179,7 +185,7 @@ int main()
     zar::GLAnimation dance_animation("assets/objects/vampire/dancing_vampire.dae", object_vampire.get_bone_info_map(),
                                      object_vampire.get_bone_count());
     zar::GLAnimator animator(&dance_animation);
-
+    grid::GLSkybox* skybox = new grid::GLSkybox("nubes", "jpg");
 
     const grid::Texture texture1("assets/textures/container.jpg");
     grid::Texture texture2("assets/textures/awesomeface.png");
@@ -196,6 +202,8 @@ int main()
     /*for (PxU32 i = 0; i < frameCount; i++)
         stepPhysics(false);
     cleanupPhysics(false);*/
+
+   
 
     glm::mat4 model;
 
@@ -231,6 +239,8 @@ int main()
 
         // --------------------------------------------------------------------------------------------------------
 
+        skybox->render(*camera, glm::vec3(1));
+
         step_physics(true);
 
         PxScene* scene;
@@ -256,7 +266,7 @@ int main()
             for (PxU32 i = 1; i < static_cast<PxU32>(actors.size()); i++)
             {
                 const PxU32 nb_shapes = actors[i]->getNbShapes();
-                spdlog::info("nbShapes: {}", actors.size());
+                // spdlog::info("nbShapes: {}", actors.size());
                 PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
                 actors[i]->getShapes(shapes, nb_shapes);
                 // bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
@@ -275,9 +285,9 @@ int main()
                     model = glm::translate(model, glm::vec3(shapePose.getPosition().x,
                                                             shapePose.getPosition().y - 10.0f,
                                                             shapePose.getPosition().z));
-                    spdlog::info("position ({},{},{})", shapePose.getPosition().x,
-                                 shapePose.getPosition().y,
-                                 shapePose.getPosition().z);
+                    // spdlog::info("position ({},{},{})", shapePose.getPosition().x,
+                    //              shapePose.getPosition().y,
+                    //              shapePose.getPosition().z);
 
                     model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                     shader_camera.set_mat4("model", model);
