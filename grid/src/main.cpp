@@ -24,6 +24,7 @@
 #include "imgui.h"
 #include "PxPhysXConfig.h"
 #include "PxPhysicsAPI.h"
+#include "data/floor.h"
 
 using namespace physx;
 
@@ -174,6 +175,7 @@ int main()
 
     grid::Asset::load_shader("cubemaps");
     grid::Asset::load_shader("skybox");
+    grid::Asset::load_shader("terrain");
 
     grid::Shader shader_camera("7.3.camera");
     grid::Shader shader_animation("1.model");
@@ -186,6 +188,8 @@ int main()
                                      object_vampire.get_bone_count());
     zar::GLAnimator animator(&dance_animation);
     grid::GLSkybox* skybox = new grid::GLSkybox("nubes", "jpg");
+    grid::Floor* floor = new grid::Floor("marble.jpg", glm::vec3(100, -0.01f, 100), 50.0f);
+
 
     const grid::Texture texture1("assets/textures/container.jpg");
     grid::Texture texture2("assets/textures/awesomeface.png");
@@ -203,7 +207,6 @@ int main()
         stepPhysics(false);
     cleanupPhysics(false);*/
 
-   
 
     glm::mat4 model;
 
@@ -312,6 +315,8 @@ int main()
         object_vampire.draw(shader_camera);
 
         object_bear.render(shader_model, projection, view);
+
+        floor->render(*camera, glm::vec3(1));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
