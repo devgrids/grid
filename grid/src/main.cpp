@@ -178,10 +178,8 @@ int main()
     grid::dev::load_shader("skybox");
     grid::dev::load_shader("terrain");
     grid::dev::load_shader("model");
-    grid::dev::load_shader("camera");
     grid::dev::load_shader("animation");
-
-    grid::Shader shader_camera = grid::dev::get_shader("camera");
+    
     grid::GameObject vampire("assets/objects/vampire/dancing_vampire.dae", true);
     grid::GameObjectSystem* objects = grid::GameObjectSystem::instance();
 
@@ -190,8 +188,6 @@ int main()
 
     grid::GLSkybox* skybox = new grid::GLSkybox("blue", "png");
     grid::Floor* floor = new grid::Floor("marble.jpg", glm::vec3(100, -0.01f, 100), 50.0f);
-
-    shader_camera.use();
 
     zar::CameraComponent camera_component(camera);
     camera_component.start();
@@ -223,15 +219,6 @@ int main()
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader_camera.use();
-
-        // --------------------------------------------------------------------------------------------------------
-
-      
-
-        shader_camera.set_mat4("projection", projection);
-        shader_camera.set_mat4("view", view);
 
 
         // --------------------------------------------------------------------------------------------------------
