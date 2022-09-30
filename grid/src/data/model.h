@@ -9,7 +9,7 @@
 
 namespace grid
 {
-    class __declspec(dllexport) Model : public zar::GLModel
+    class Model : public zar::GLModel
     {
     public:
         explicit Model(std::string const& path, bool gamma = false);

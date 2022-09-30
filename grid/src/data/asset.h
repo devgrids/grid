@@ -16,8 +16,8 @@ namespace grid
         static float get_aspect_viewport();
         static void clear();
         
-        constexpr static unsigned int SCREEN_WIDTH = 800;
-        constexpr static unsigned int SCREEN_HEIGHT = 600;
+        constexpr static unsigned int SCREEN_WIDTH = 1280;
+        constexpr static unsigned int SCREEN_HEIGHT = 720;
     
     private:
         

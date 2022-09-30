@@ -8,7 +8,7 @@
 #include "data/texture.h"
 #include <zar/api/opengl/gl_camera.h>
 
-#include "data/application.h"
+
 #include "data/model.h"
 
 #include "data/shader.h"
@@ -25,6 +25,7 @@
 #include "PxPhysXConfig.h"
 #include "PxPhysicsAPI.h"
 #include "data/floor.h"
+#include "systems/game_object_system.h"
 
 using namespace physx;
 
@@ -176,27 +177,26 @@ int main()
     grid::Asset::load_shader("cubemaps");
     grid::Asset::load_shader("skybox");
     grid::Asset::load_shader("terrain");
+    grid::Asset::load_shader("model");
+    grid::Asset::load_shader("camera");
+    grid::Asset::load_shader("animation");
 
-    grid::Shader shader_camera("7.3.camera");
-    grid::Shader shader_animation("1.model");
-    grid::Shader shader_model("model");
+    grid::Shader shader_camera = grid::Asset::get_shader("camera");
+    grid::Shader shader_animation = grid::Asset::get_shader("animation");
+    grid::Shader shader_model = grid::Asset::get_shader("model");
 
-    grid::GameObject object_bear("assets/objects/bear/bear.obj");
-    grid::GameObject plane("assets/objects/plane/plane.obj");
-    grid::Model object_vampire("assets/objects/vampire/dancing_vampire.dae");
-    zar::GLAnimation dance_animation("assets/objects/vampire/dancing_vampire.dae", object_vampire.get_bone_info_map(),
-                                     object_vampire.get_bone_count());
-    zar::GLAnimator animator(&dance_animation);
+
+    grid::GameObject vampire("assets/objects/vampire/dancing_vampire.dae", true);
+
+    grid::GameObjectSystem* objects = grid::GameObjectSystem::instance();
+
+    objects->add("assets/objects/bear/bear.obj");
+    objects->add(&vampire);
+
     grid::GLSkybox* skybox = new grid::GLSkybox("blue", "png");
     grid::Floor* floor = new grid::Floor("marble.jpg", glm::vec3(100, -0.01f, 100), 50.0f);
 
-
-    const grid::Texture texture1("assets/textures/container.jpg");
-    grid::Texture texture2("assets/textures/awesomeface.png");
-
     shader_camera.use();
-    shader_camera.set_int("texture1", 0);
-    shader_camera.set_int("texture2", 1);
 
     zar::CameraComponent camera_component(camera);
     camera_component.start();
@@ -208,8 +208,8 @@ int main()
     cleanupPhysics(false);*/
 
 
-    glm::mat4 model;
-
+    objects->start();
+    
     while (!glfwWindowShouldClose(window))
     {
         camera_component.update();
@@ -219,104 +219,31 @@ int main()
         lastFrame = current_frame;
 
         processInput(window);
-        animator.update_animation(deltaTime);
+        objects->update(deltaTime);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glActiveTexture(GL_TEXTURE0);
-        texture1.bind();
-        glActiveTexture(GL_TEXTURE1);
-        texture2.bind();
 
         shader_camera.use();
 
         // --------------------------------------------------------------------------------------------------------
 
         glm::mat4 projection = camera->get_projection_matrix(
-            static_cast<float>(Application::SCR_WIDTH) / static_cast<float>(Application::SCR_HEIGHT));
+            static_cast<float>(grid::Asset::SCREEN_WIDTH) / static_cast<float>(grid::Asset::SCREEN_HEIGHT));
         glm::mat4 view = camera->get_view_matrix();
 
         shader_camera.set_mat4("projection", projection);
         shader_camera.set_mat4("view", view);
 
+
         // --------------------------------------------------------------------------------------------------------
 
         skybox->render(*camera, glm::vec3(1));
-
-        step_physics(true);
-
-        PxScene* scene;
-        PxGetPhysics().getScenes(&scene, 1);
-        PxU32 nb_actors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-        if (nb_actors)
-        {
-            std::vector<PxRigidActor*> actors(nb_actors);
-            scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC,
-                             reinterpret_cast<PxActor**>(&actors[0]), nb_actors);
-            //renderActors(&actors[0], static_cast<PxU32>(actors.size()));
-
-            PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0, 0, 0));
-            model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::scale(model, glm::vec3(10, 0, 10));
-
-            shader_model.set_mat4("model", model);
-            plane.render(shader_model, projection, view);
-
-            for (PxU32 i = 1; i < static_cast<PxU32>(actors.size()); i++)
-            {
-                const PxU32 nb_shapes = actors[i]->getNbShapes();
-                // spdlog::info("nbShapes: {}", actors.size());
-                PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
-                actors[i]->getShapes(shapes, nb_shapes);
-                // bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
-
-                for (PxU32 j = 0; j < nb_shapes; j++)
-                {
-                    const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
-                    PxGeometryHolder h = shapes[j]->getGeometry();
-
-                    if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
-                        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-                    // render object
-
-                    model = glm::mat4(1.0f);
-                    model = glm::translate(model, glm::vec3(shapePose.getPosition().x,
-                                                            shapePose.getPosition().y - 10.0f,
-                                                            shapePose.getPosition().z));
-                    // spdlog::info("position ({},{},{})", shapePose.getPosition().x,
-                    //              shapePose.getPosition().y,
-                    //              shapePose.getPosition().z);
-
-                    model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-                    shader_camera.set_mat4("model", model);
-
-                    zar::render_cube();
-                }
-            }
-        }
-
-        shader_animation.use();
-        shader_animation.set_mat4("projection", projection);
-        shader_animation.set_mat4("view", view);
-
-        auto transforms = animator.get_final_bone_matrices();
-        for (int i = 0; i < transforms.size(); ++i)
-            shader_animation.set_mat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(3.0f, -0.4f, 3.0f));
-        model = glm::scale(model, glm::vec3(.5f, .5f, .5f));
-        shader_animation.set_mat4("model", model);
-        object_vampire.draw(shader_camera);
-
-        object_bear.render(shader_model, projection, view);
-
         floor->render(*camera, glm::vec3(1));
+
+        objects->set_projection_view(projection, view);
+
+        objects->render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
