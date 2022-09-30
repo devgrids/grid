@@ -187,7 +187,7 @@ int main()
     zar::GLAnimation dance_animation("assets/objects/vampire/dancing_vampire.dae", object_vampire.get_bone_info_map(),
                                      object_vampire.get_bone_count());
     zar::GLAnimator animator(&dance_animation);
-    grid::GLSkybox* skybox = new grid::GLSkybox("nubes", "jpg");
+    grid::GLSkybox* skybox = new grid::GLSkybox("blue", "png");
     grid::Floor* floor = new grid::Floor("marble.jpg", glm::vec3(100, -0.01f, 100), 50.0f);
 
 
