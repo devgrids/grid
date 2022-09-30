@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include <map>
 
-#include "Shader.h"
+#include "../data/Shader.h"
 
 namespace grid
 {
-    class Asset
+    class dev
     {
     public:
-        Asset();
+        dev();
         static std::map<std::string, Shader> shaders;
         static Shader load_shader(const std::string& name);
         static Shader get_shader(const std::string& name);

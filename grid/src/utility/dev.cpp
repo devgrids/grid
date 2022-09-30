@@ -1,28 +1,28 @@
-﻿#include "asset.h"
+﻿#include "dev.h"
 
 #include "vendor/assimp/contrib/stb/stb_image.h"
 
 namespace grid
 {
-    std::map<std::string, Shader> Asset::shaders;
+    std::map<std::string, Shader> dev::shaders;
 
-    Asset::Asset()
+    dev::dev()
     {
         spdlog::info("Static Assets");
     }
 
-    Shader Asset::load_shader(const std::string& name)
+    Shader dev::load_shader(const std::string& name)
     {
         shaders[name] = Shader(name);
         return shaders[name];
     }
 
-    Shader Asset::get_shader(const std::string& name)
+    Shader dev::get_shader(const std::string& name)
     {
         return shaders[name];
     }
 
-    GLuint Asset::load_cubemap(const std::vector<std::string> faces)
+    GLuint dev::load_cubemap(const std::vector<std::string> faces)
     {
         stbi_set_flip_vertically_on_load(false);
         GLuint texture_id;
@@ -60,12 +60,12 @@ namespace grid
         return texture_id;
     }
 
-    float Asset::get_aspect_viewport()
+    float dev::get_aspect_viewport()
     {
-        return static_cast<float>(Asset::SCREEN_WIDTH) / static_cast<float>(SCREEN_HEIGHT);
+        return static_cast<float>(dev::SCREEN_WIDTH) / static_cast<float>(SCREEN_HEIGHT);
     }
 
-    void Asset::clear()
+    void dev::clear()
     {
         for (const auto& iter : shaders)
             glDeleteProgram(iter.second.get_id());

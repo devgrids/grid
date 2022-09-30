@@ -1,11 +1,11 @@
 ﻿#include "floor.h"
 
-#include "asset.h"
+#include "../utility/dev.h"
 #include "Texture.h"
 
 grid::Floor::Floor(std::string path, const glm::vec3 volumen, const float repeat)
 {
-    this->shader = Asset::get_shader("terrain");
+    this->shader = dev::get_shader("terrain");
     this->volumen = volumen;
     this->repeat = repeat;
 
@@ -21,7 +21,7 @@ void grid::Floor::render(zar::GLCamera& camera, glm::vec3 ambient)
     shader.use();
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = camera.get_view_matrix();
-    glm::mat4 projection = camera.get_projection_matrix(Asset::get_aspect_viewport());
+    glm::mat4 projection = camera.get_projection_matrix(dev::get_aspect_viewport());
     shader.set_mat4("view", view);
     shader.set_mat4("projection", projection);
     shader.set_vec3("ambient", ambient);

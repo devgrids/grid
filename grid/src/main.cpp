@@ -18,7 +18,7 @@
 #include "zar/api/opengl/gl_cube.h"
 #include "zar/ecs/components/camera_component.h"
 
-#include "data/asset.h"
+#include "utility/dev.h"
 #include "data/Skybox.h"
 
 #include "imgui.h"
@@ -174,20 +174,15 @@ int main()
     if (GLenum err = glewInit()) return 0;
     glEnable(GL_DEPTH_TEST);
 
-    grid::Asset::load_shader("cubemaps");
-    grid::Asset::load_shader("skybox");
-    grid::Asset::load_shader("terrain");
-    grid::Asset::load_shader("model");
-    grid::Asset::load_shader("camera");
-    grid::Asset::load_shader("animation");
+    grid::dev::load_shader("cubemaps");
+    grid::dev::load_shader("skybox");
+    grid::dev::load_shader("terrain");
+    grid::dev::load_shader("model");
+    grid::dev::load_shader("camera");
+    grid::dev::load_shader("animation");
 
-    grid::Shader shader_camera = grid::Asset::get_shader("camera");
-    grid::Shader shader_animation = grid::Asset::get_shader("animation");
-    grid::Shader shader_model = grid::Asset::get_shader("model");
-
-
+    grid::Shader shader_camera = grid::dev::get_shader("camera");
     grid::GameObject vampire("assets/objects/vampire/dancing_vampire.dae", true);
-
     grid::GameObjectSystem* objects = grid::GameObjectSystem::instance();
 
     objects->add("assets/objects/bear/bear.obj");
@@ -209,9 +204,14 @@ int main()
 
 
     objects->start();
+
+    glm::mat4 projection = camera->get_projection_matrix(
+          static_cast<float>(grid::dev::SCREEN_WIDTH) / static_cast<float>(grid::dev::SCREEN_HEIGHT));
     
     while (!glfwWindowShouldClose(window))
     {
+        glm::mat4 view = camera->get_view_matrix();
+        
         camera_component.update();
 
         auto current_frame = static_cast<float>(glfwGetTime());
@@ -228,9 +228,7 @@ int main()
 
         // --------------------------------------------------------------------------------------------------------
 
-        glm::mat4 projection = camera->get_projection_matrix(
-            static_cast<float>(grid::Asset::SCREEN_WIDTH) / static_cast<float>(grid::Asset::SCREEN_HEIGHT));
-        glm::mat4 view = camera->get_view_matrix();
+      
 
         shader_camera.set_mat4("projection", projection);
         shader_camera.set_mat4("view", view);

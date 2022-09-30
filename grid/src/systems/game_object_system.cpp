@@ -1,6 +1,6 @@
 ﻿#include "game_object_system.h"
 
-#include "../data/asset.h"
+#include "../utility/dev.h"
 
 grid::GameObjectSystem* grid::GameObjectSystem::instance()
 {
@@ -14,8 +14,8 @@ grid::GameObjectSystem::~GameObjectSystem()
 void grid::GameObjectSystem::start()
 {
     ISystem::start();
-    shader_model = Asset::get_shader("model");
-    shader_animation = Asset::get_shader("animation");
+    shader_model = dev::get_shader("model");
+    shader_animation = dev::get_shader("animation");
 }
 
 void grid::GameObjectSystem::update(const float delta_time)

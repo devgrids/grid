@@ -1,11 +1,11 @@
 ﻿#include "Skybox.h"
-#include "asset.h"
+#include "../utility/dev.h"
 
 grid::GLSkybox::GLSkybox(const std::string& name, const std::string& type)
 {
     this->name_skybox = name;
-    this->shader_cubemap = Asset::get_shader("cubemaps");
-    this->shader_skybox = Asset::get_shader("skybox");
+    this->shader_cubemap = dev::get_shader("cubemaps");
+    this->shader_skybox = dev::get_shader("skybox");
 
     load_skybox(name, type);
     config_cube_map();
@@ -17,7 +17,7 @@ void grid::GLSkybox::render(const zar::GLCamera& camera, const glm::vec3 ambient
     shader_cubemap.use();
     const glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = camera.get_view_matrix();
-    const glm::mat4 projection = camera.get_projection_matrix(Asset::get_aspect_viewport());
+    const glm::mat4 projection = camera.get_projection_matrix(dev::get_aspect_viewport());
     
     shader_cubemap.set_mat4("model", model);
     shader_cubemap.set_mat4("view", view);
@@ -51,7 +51,7 @@ void grid::GLSkybox::load_skybox(const std::string& name, const std::string& typ
         faces.push_back(direction);
     }
     glDeleteTextures(1, &cubemap_texture);
-    cubemap_texture = Asset::load_cubemap(faces);
+    cubemap_texture = dev::load_cubemap(faces);
 }
 
 void grid::GLSkybox::config_cube_map()
