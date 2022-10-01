@@ -2,23 +2,23 @@
 
 #include "../utility/dev.h"
 
-grid::GameObjectSystem* grid::GameObjectSystem::instance()
+grid::GameObject_System* grid::GameObject_System::instance()
 {
-    static GameObjectSystem instance;
+    static GameObject_System instance;
     return &instance;
 }
 
-grid::GameObjectSystem::~GameObjectSystem()
+grid::GameObject_System::~GameObject_System()
 = default;
 
-void grid::GameObjectSystem::start()
+void grid::GameObject_System::start()
 {
     ISystem::start();
     shader_model = dev::get_shader("model");
     shader_animation = dev::get_shader("animation");
 }
 
-void grid::GameObjectSystem::update(const float delta_time)
+void grid::GameObject_System::update(const float& delta_time)
 {
     ISystem::update(delta_time);
     for (GameObject*& object : objects)
@@ -27,7 +27,7 @@ void grid::GameObjectSystem::update(const float delta_time)
     }
 }
 
-void grid::GameObjectSystem::render()
+void grid::GameObject_System::render()
 {
     ISystem::render();
     for (GameObject*& object : objects)
@@ -40,31 +40,31 @@ void grid::GameObjectSystem::render()
     }
 }
 
-void grid::GameObjectSystem::add(GameObject* object)
+void grid::GameObject_System::add(GameObject* object)
 {
     objects.push_back(object);
 }
 
-void grid::GameObjectSystem::add(std::string const& path, const bool is_animation)
+void grid::GameObject_System::add(std::string const& path, const bool is_animation)
 {
     objects.push_back(new GameObject(path, is_animation));
 }
 
-void grid::GameObjectSystem::remove(GameObject* object)
+void grid::GameObject_System::remove(GameObject* object)
 {
 }
 
-void grid::GameObjectSystem::set_projection(const glm::mat4 projection)
+void grid::GameObject_System::set_projection(const glm::mat4 projection)
 {
     this->projection = projection;
 }
 
-void grid::GameObjectSystem::set_view(const glm::mat4 view)
+void grid::GameObject_System::set_view(const glm::mat4 view)
 {
     this->view = view;
 }
 
-void grid::GameObjectSystem::set_projection_view(const glm::mat4 projection, const glm::mat4 view)
+void grid::GameObject_System::set_projection_view(const glm::mat4 projection, const glm::mat4 view)
 {
     this->projection = projection;
     this->view = view;

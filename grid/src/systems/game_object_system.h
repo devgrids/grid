@@ -4,14 +4,14 @@
 
 namespace grid
 {
-    class GameObjectSystem final : public ISystem
+    class GameObject_System final : public ISystem
     {
     public:
-        static GameObjectSystem* instance();
-        ~GameObjectSystem() override;
-        
+        static GameObject_System* instance();
+        ~GameObject_System() override;
+
         void start() override;
-        void update(const float delta_time) override;
+        void update(const float& delta_time) override;
         void render() override;
 
         void add(GameObject* object);
@@ -23,8 +23,8 @@ namespace grid
         void set_projection_view(glm::mat4 projection, glm::mat4 view);
     private:
         std::vector<GameObject*> objects;
-        glm::mat4 projection;
-        glm::mat4 view;
+        glm::mat4 projection = {};
+        glm::mat4 view = {};
 
         Shader shader_model;
         Shader shader_animation;
