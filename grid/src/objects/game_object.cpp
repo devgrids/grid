@@ -26,8 +26,8 @@ grid::GameObject::GameObject(std::string const& path, glm::vec3 position, glm::v
     if (physic_type == SPHERE)
     {
         body = Physics_System::instance()->create_dynamic(
-            physx::PxTransform(physx::PxVec3(0, 20, 0)),
-            physx::PxSphereGeometry(10), physx::PxVec3(0, -50, -1)
+            physx::PxTransform(physx::PxVec3(position.x, position.y, position.z)),
+            physx::PxSphereGeometry(1), physx::PxVec3(0, -50, -1)
         );
     }
 }
@@ -39,10 +39,10 @@ void grid::GameObject::update(const float delta_time)
         animator->update_animation(delta_time);
     }
 
-    if (physic_type == SPHERE)
+    if (body != nullptr)
     {
         position = glm::vec3(body->getGlobalPose().p.x,
-                             body->getGlobalPose().p.y - 10.0f,
+                             body->getGlobalPose().p.y - 1.0f,
                              body->getGlobalPose().p.z);
 
         rotation = glm::vec3(body->getGlobalPose().q.x,

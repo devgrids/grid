@@ -18,7 +18,7 @@ grid::Physics_System* grid::Physics_System::instance()
 
 grid::Physics_System::Physics_System()
 {
-    init_physics(true);
+    // start();
 }
 
 grid::Physics_System::~Physics_System()
@@ -28,20 +28,6 @@ grid::Physics_System::~Physics_System()
 void grid::Physics_System::start()
 {
     ISystem::start();
-}
-
-void grid::Physics_System::update(const float& delta_time)
-{
-    ISystem::update(delta_time);
-}
-
-void grid::Physics_System::render()
-{
-    ISystem::render();
-}
-
-void grid::Physics_System::init_physics(const bool interactive)
-{
     g_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, g_allocator, g_error_callback);
 
     g_pvd = PxCreatePvd(*g_foundation);
@@ -70,6 +56,20 @@ void grid::Physics_System::init_physics(const bool interactive)
     g_scene->addActor(*ground_plane);
 }
 
+void grid::Physics_System::update(const float& delta_time)
+{
+    ISystem::update(delta_time);
+    PX_UNUSED(true);
+    g_scene->simulate(1.0f / 60.0f);
+    g_scene->fetchResults(true);
+}
+
+void grid::Physics_System::render()
+{
+    ISystem::render();
+}
+
+
 physx::PxRigidDynamic* grid::Physics_System::create_dynamic(const physx::PxTransform& t,
                                                             const physx::PxGeometry& geometry,
                                                             const physx::PxVec3& velocity)
@@ -80,13 +80,6 @@ physx::PxRigidDynamic* grid::Physics_System::create_dynamic(const physx::PxTrans
     g_scene->addActor(*dynamic);
     m_body.push_back(dynamic);
     return dynamic;
-}
-
-void grid::Physics_System::step_physics(const bool interactive) const
-{
-    PX_UNUSED(interactive);
-    g_scene->simulate(1.0f / 60.0f);
-    g_scene->fetchResults(true);
 }
 
 void grid::Physics_System::cleanup_physics(const bool interactive) const

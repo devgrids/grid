@@ -15,14 +15,12 @@ namespace grid
         void start() override;
         void update(const float& delta_time) override;
         void render() override;
-
-        void init_physics(const bool interactive = true);
+        
         physx::PxRigidDynamic* create_dynamic(
             const physx::PxTransform& t,
             const physx::PxGeometry& geometry,
             const physx::PxVec3& velocity = physx::PxVec3(0)
         );
-        void step_physics(bool interactive = true) const;
         void cleanup_physics(bool interactive = true) const;
         glm::vec3 debug();
 

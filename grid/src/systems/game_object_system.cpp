@@ -8,6 +8,11 @@ grid::GameObject_System* grid::GameObject_System::instance()
     return &instance;
 }
 
+grid::GameObject_System::GameObject_System()
+{
+    // start();
+}
+
 grid::GameObject_System::~GameObject_System()
 = default;
 

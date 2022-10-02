@@ -66,9 +66,21 @@ int main()
     grid::dev::load_shader("model");
     grid::dev::load_shader("animation");
 
-    grid::GameObject_System* objects = grid::GameObject_System::instance();
+
+    std::map<std::string, grid::ISystem*> systems;
+
+    grid::GameObject_System* object_system = grid::GameObject_System::instance();
     grid::Physics_System* physics_system = grid::Physics_System::instance();
-    // physics_system->init_physics(true);
+
+    systems.insert(std::pair<std::string, grid::ISystem*>("objects", object_system));
+    systems.insert(std::pair<std::string, grid::ISystem*>("physics", physics_system));
+
+
+    for (const auto& system : systems)
+    {
+        system.second->start();
+    }
+
 
     grid::GameObject vampire(
         "assets/objects/vampire/dancing_vampire.dae",
@@ -76,10 +88,10 @@ int main()
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         grid::ANIMATION,
-        grid::SPHERE
+        grid::NON_PHYSICS
     );
 
-    objects->add(
+    object_system->add(
         "assets/objects/bear/bear.obj",
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
@@ -88,16 +100,31 @@ int main()
         grid::SPHERE
     );
 
-    objects->add(&vampire);
+    object_system->add(
+        "assets/objects/lion/Lion.obj",
+        glm::vec3(20.0f, 0.0f, 20.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(0.0f, 90.0f, 0.0f),
+        grid::MODEL,
+        grid::SPHERE
+    );
 
-    grid::GLSkybox* skybox = new grid::GLSkybox("blue", "png");
-    grid::Floor* floor = new grid::Floor("marble.jpg", glm::vec3(100, -0.01f, 100), 50.0f);
+    object_system->add(
+       "assets/objects/ibex/female.obj",
+       glm::vec3(6.0f, 0.0f, 7.0f),
+       glm::vec3(1.0f, 1.0f, 1.0f),
+       glm::vec3(0.0f, 90.0f, 0.0f),
+       grid::MODEL,
+       grid::SPHERE
+   );
+
+    object_system->add(&vampire);
+
+    const grid::GLSkybox* skybox = new grid::GLSkybox("blue", "png");
+    const auto floor = new grid::Floor("marble.jpg", glm::vec3(100, -0.01f, 100), 50.0f);
 
     zar::CameraComponent camera_component(camera);
     camera_component.start();
-
-
-    objects->start();
 
     const glm::mat4 projection = camera->get_projection_matrix(
         static_cast<float>(grid::dev::SCREEN_WIDTH) / static_cast<float>(grid::dev::SCREEN_HEIGHT));
@@ -113,7 +140,11 @@ int main()
         last_frame = current_frame;
 
         process_input(window);
-        objects->update(delta_time);
+
+        for (const auto& system : systems)
+        {
+            system.second->update(delta_time);
+        }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -124,10 +155,12 @@ int main()
         skybox->render(*camera, glm::vec3(1));
         floor->render(*camera, glm::vec3(1));
 
-        physics_system->step_physics();
+        object_system->set_projection_view(projection, view);
 
-        objects->set_projection_view(projection, view);
-        objects->render();
+        for (const auto& system : systems)
+        {
+            system.second->render();
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();

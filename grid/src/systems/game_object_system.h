@@ -8,6 +8,7 @@ namespace grid
     {
     public:
         static GameObject_System* instance();
+        GameObject_System();
         ~GameObject_System() override;
 
         void start() override;
