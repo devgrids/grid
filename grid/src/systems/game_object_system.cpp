@@ -33,7 +33,9 @@ void grid::GameObject_System::render()
     for (GameObject*& object : objects)
     {
         object->render(
-            object->is_animation() ? shader_animation : shader_model,
+            (object->get_object_type() == ANIMATION)
+                ? shader_animation
+                : shader_model,
             projection,
             view
         );
@@ -45,10 +47,12 @@ void grid::GameObject_System::add(GameObject* object)
     objects.push_back(object);
 }
 
-void grid::GameObject_System::add(std::string const& path, const bool is_animation)
+void grid::GameObject_System::add(std::string const& path, glm::vec3 position, glm::vec3 scale, glm::vec3 rotation,
+                                  const ObjectType& object_type, const PhysicType& physic_type)
 {
-    objects.push_back(new GameObject(path, is_animation));
+    objects.push_back(new GameObject(path, position, scale, rotation, object_type, physic_type));
 }
+
 
 void grid::GameObject_System::remove(GameObject* object)
 {

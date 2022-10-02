@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "PxPhysicsAPI.h"
 #include "../interfaces/interface_system.h"
+#include <vector>
 
 namespace grid
 {
@@ -8,21 +9,22 @@ namespace grid
     {
     public:
         static Physics_System* instance();
+        Physics_System();
         ~Physics_System() override;
-        
+
         void start() override;
         void update(const float& delta_time) override;
         void render() override;
 
-        void init_physics(const bool interactive);
+        void init_physics(const bool interactive = true);
         physx::PxRigidDynamic* create_dynamic(
             const physx::PxTransform& t,
             const physx::PxGeometry& geometry,
             const physx::PxVec3& velocity = physx::PxVec3(0)
-        ) const;
-        void step_physics(bool interactive) const;
-        void cleanup_physics(bool interactive) const;
-        glm::vec3 debug() const;
+        );
+        void step_physics(bool interactive = true) const;
+        void cleanup_physics(bool interactive = true) const;
+        glm::vec3 debug();
 
     private:
         physx::PxDefaultAllocator g_allocator;
@@ -33,5 +35,7 @@ namespace grid
         physx::PxScene* g_scene = nullptr;
         physx::PxMaterial* g_material = nullptr;
         physx::PxPvd* g_pvd = nullptr;
+
+        std::vector<physx::PxRigidDynamic*> m_body;
     };
 }

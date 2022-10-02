@@ -15,7 +15,11 @@ namespace grid
         void render() override;
 
         void add(GameObject* object);
-        void add(std::string const& path, bool is_animation = false);
+        void add(std::string const& path, glm::vec3 position = glm::vec3(0.0f),
+                 glm::vec3 scale = glm::vec3(1.0f),
+                 glm::vec3 rotation = glm::vec3(0.0f),
+                 const ObjectType& object_type = MODEL,
+                 const PhysicType& physic_type = NON_PHYSICS);
         void remove(GameObject* object);
 
         void set_projection(glm::mat4 projection);

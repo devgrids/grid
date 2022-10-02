@@ -68,11 +68,26 @@ int main()
 
     grid::GameObject_System* objects = grid::GameObject_System::instance();
     grid::Physics_System* physics_system = grid::Physics_System::instance();
+    // physics_system->init_physics(true);
 
-    grid::GameObject vampire("assets/objects/vampire/dancing_vampire.dae", true);
-    grid::GameObject bear("assets/objects/bear/bear.obj");
+    grid::GameObject vampire(
+        "assets/objects/vampire/dancing_vampire.dae",
+        glm::vec3(10.0f, 0.0f, 10.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        grid::ANIMATION,
+        grid::SPHERE
+    );
 
-    objects->add("assets/objects/bear/bear.obj");
+    objects->add(
+        "assets/objects/bear/bear.obj",
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        grid::MODEL,
+        grid::SPHERE
+    );
+
     objects->add(&vampire);
 
     grid::GLSkybox* skybox = new grid::GLSkybox("blue", "png");
@@ -81,10 +96,7 @@ int main()
     zar::CameraComponent camera_component(camera);
     camera_component.start();
 
-    physics_system->init_physics(true);
-    physics_system->create_dynamic(
-        physx::PxTransform(physx::PxVec3(0, 20, 0)), physx::PxSphereGeometry(10), physx::PxVec3(0, -50, -1)
-    );
+
     objects->start();
 
     const glm::mat4 projection = camera->get_projection_matrix(
@@ -103,8 +115,6 @@ int main()
         process_input(window);
         objects->update(delta_time);
 
-        bear.update(delta_time);
-
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -114,20 +124,16 @@ int main()
         skybox->render(*camera, glm::vec3(1));
         floor->render(*camera, glm::vec3(1));
 
-        physics_system->step_physics(true);
-
-        bear.position = physics_system->debug();
+        physics_system->step_physics();
 
         objects->set_projection_view(projection, view);
         objects->render();
-
-        bear.render(grid::dev::get_shader("model"), projection, view);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    physics_system->cleanup_physics(true);
+    physics_system->cleanup_physics();
     glfwTerminate();
     return 0;
 }

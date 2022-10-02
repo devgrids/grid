@@ -16,6 +16,11 @@ grid::Physics_System* grid::Physics_System::instance()
     return &instance;
 }
 
+grid::Physics_System::Physics_System()
+{
+    init_physics(true);
+}
+
 grid::Physics_System::~Physics_System()
 {
 }
@@ -67,12 +72,13 @@ void grid::Physics_System::init_physics(const bool interactive)
 
 physx::PxRigidDynamic* grid::Physics_System::create_dynamic(const physx::PxTransform& t,
                                                             const physx::PxGeometry& geometry,
-                                                            const physx::PxVec3& velocity) const
+                                                            const physx::PxVec3& velocity)
 {
     physx::PxRigidDynamic* dynamic = PxCreateDynamic(*g_physics, t, geometry, *g_material, 10.0f);
     dynamic->setAngularDamping(0.5f);
     dynamic->setLinearVelocity(velocity);
     g_scene->addActor(*dynamic);
+    m_body.push_back(dynamic);
     return dynamic;
 }
 
@@ -95,50 +101,60 @@ void grid::Physics_System::cleanup_physics(const bool interactive) const
     g_foundation->release();
 }
 
-glm::vec3 grid::Physics_System::debug() const
+glm::vec3 grid::Physics_System::debug()
 {
-    physx::PxScene* scene;
-    PxGetPhysics().getScenes(&scene, 1);
-    const physx::PxU32 nb_actors = scene->getNbActors(
-        physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC);
-    if (nb_actors)
+    // physx::PxScene* scene;
+    // PxGetPhysics().getScenes(&scene, 1);
+    // const physx::PxU32 nb_actors = scene->getNbActors(
+    //     physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC);
+    // if (nb_actors)
+    // {
+    //     std::vector<physx::PxRigidActor*> actors(nb_actors);
+    //     scene->getActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC,
+    //                      reinterpret_cast<physx::PxActor**>(&actors[0]), nb_actors);
+    //     //renderActors(&actors[0], static_cast<PxU32>(actors.size()));
+    //
+    //     // SUELO
+    //
+    //     for (physx::PxU32 i = 1; i < static_cast<physx::PxU32>(actors.size()); i++)
+    //     {
+    //         physx::PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+    //         const physx::PxU32 nb_shapes = actors[i]->getNbShapes();
+    //         // spdlog::info("nbShapes: {}", actors.size());
+    //         PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
+    //         actors[i]->getShapes(shapes, nb_shapes);
+    //         // bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
+    //
+    //         for (physx::PxU32 j = 0; j < nb_shapes; j++)
+    //         {
+    //             const physx::PxMat44 shape_pose(physx::PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
+    //             physx::PxGeometryHolder h = shapes[j]->getGeometry();
+    //
+    //             if (shapes[j]->getFlags() & physx::PxShapeFlag::eTRIGGER_SHAPE)
+    //                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //
+    //
+    //             // spdlog::info("position ({},{},{})", shape_pose.getPosition().x,
+    //             //              shape_pose.getPosition().y - 10.0f,
+    //             //              shape_pose.getPosition().z);
+    //
+    //             return {
+    //                 shape_pose.getPosition().x,
+    //                 shape_pose.getPosition().y - 10.0f,
+    //                 shape_pose.getPosition().z
+    //             };
+    //         }
+    //     }
+    // }
+
+    for (physx::PxRigidDynamic*& body : m_body)
     {
-        std::vector<physx::PxRigidActor*> actors(nb_actors);
-        scene->getActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC,
-                         reinterpret_cast<physx::PxActor**>(&actors[0]), nb_actors);
-        //renderActors(&actors[0], static_cast<PxU32>(actors.size()));
-
-        // SUELO
-
-        for (physx::PxU32 i = 1; i < static_cast<physx::PxU32>(actors.size()); i++)
-        {
-            physx::PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-            const physx::PxU32 nb_shapes = actors[i]->getNbShapes();
-            // spdlog::info("nbShapes: {}", actors.size());
-            PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
-            actors[i]->getShapes(shapes, nb_shapes);
-            // bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
-
-            for (physx::PxU32 j = 0; j < nb_shapes; j++)
-            {
-                const physx::PxMat44 shape_pose(physx::PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
-                physx::PxGeometryHolder h = shapes[j]->getGeometry();
-
-                if (shapes[j]->getFlags() & physx::PxShapeFlag::eTRIGGER_SHAPE)
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-                // spdlog::info("position ({},{},{})", shape_pose.getPosition().x,
-                //              shape_pose.getPosition().y - 10.0f,
-                //              shape_pose.getPosition().z);
-
-                return {
-                    shape_pose.getPosition().x,
-                    shape_pose.getPosition().y - 10.0f,
-                    shape_pose.getPosition().z
-                };
-            }
-        }
+        return {
+            body->getGlobalPose().p.x,
+            body->getGlobalPose().p.y - 10.0f,
+            body->getGlobalPose().p.z
+        };
     }
+
     return {};
 }
